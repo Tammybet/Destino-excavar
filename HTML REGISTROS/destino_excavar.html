@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Destino Excavar — Registro</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Nunito',sans-serif;background:#1a0f00;min-height:100vh;overflow-x:hidden;}
+
+/* WELCOME */
+#welcome{position:fixed;inset:0;z-index:999;background:radial-gradient(ellipse at center,#2d1a00 0%,#0a0500 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;transition:opacity .8s ease,transform .8s ease;}
+#welcome.hide{opacity:0;transform:scale(1.05);pointer-events:none;}
+.star{position:absolute;border-radius:50%;background:#f0c040;opacity:0;animation:twinkle var(--d) ease-in-out infinite var(--delay);}
+@keyframes twinkle{0%,100%{opacity:0;transform:scale(.5)}50%{opacity:.7;transform:scale(1)}}
+.floaty{position:absolute;font-size:2rem;animation:floatUp var(--d,8s) ease-in-out infinite var(--delay,0s);opacity:.25;}
+@keyframes floatUp{0%{transform:translateY(110vh) rotate(0deg);opacity:0;}20%{opacity:.3;}80%{opacity:.3;}100%{transform:translateY(-20vh) rotate(360deg);opacity:0;}}
+.ground{position:absolute;bottom:0;left:0;right:0;height:90px;background:linear-gradient(0deg,#3d1f00 0%,#6b3800 60%,transparent 100%);clip-path:polygon(0 40%,5% 20%,10% 35%,15% 15%,22% 30%,28% 10%,35% 28%,42% 8%,50% 25%,57% 5%,64% 22%,70% 8%,78% 30%,84% 12%,90% 28%,95% 15%,100% 35%,100% 100%,0 100%);}
+.logo-wrap{width:160px;height:160px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:14px;box-shadow:0 0 0 6px #f0c040,0 0 0 12px rgba(240,192,64,.3),0 0 60px rgba(240,192,64,.5);animation:logoPulse 2.5s ease-in-out infinite;margin-bottom:20px;position:relative;z-index:2;}
+@keyframes logoPulse{0%,100%{box-shadow:0 0 0 6px #f0c040,0 0 0 12px rgba(240,192,64,.3),0 0 60px rgba(240,192,64,.5);}50%{box-shadow:0 0 0 8px #f0c040,0 0 0 18px rgba(240,192,64,.4),0 0 90px rgba(240,192,64,.7);}}
+.logo-wrap svg{width:100%;height:100%;}
+.wc-title{font-family:'Fredoka One',cursive;font-size:3rem;color:#f0c040;text-shadow:3px 3px 0 #7b3f00,0 0 40px rgba(240,192,64,.6);text-align:center;line-height:1;position:relative;z-index:2;animation:titleAnim 1s ease backwards;}
+@keyframes titleAnim{from{opacity:0;transform:translateY(-30px)}to{opacity:1;transform:translateY(0)}}
+.wc-title span{color:#fff;text-shadow:2px 2px 0 #c97b2e,0 0 30px rgba(255,255,255,.4);}
+.wc-sub{font-size:1rem;color:#ffe8a0;font-weight:700;text-align:center;margin:10px 0 6px;position:relative;z-index:2;animation:titleAnim 1s .2s ease backwards;}
+.wc-verse{font-size:.85rem;color:#c97b2e;font-style:italic;text-align:center;margin-bottom:28px;position:relative;z-index:2;animation:titleAnim 1s .3s ease backwards;}
+.dig-wrap{width:260px;position:relative;z-index:2;margin-bottom:24px;animation:titleAnim 1s .4s ease backwards;}
+.dig-label{font-size:.75rem;color:#f0c040;font-weight:800;text-transform:uppercase;letter-spacing:1px;text-align:center;margin-bottom:6px;}
+.dig-bar{height:14px;background:#3d1f00;border-radius:10px;border:2px solid #c97b2e;overflow:hidden;}
+.dig-fill{height:100%;width:0;background:linear-gradient(90deg,#c97b2e,#f0c040,#ffe880);border-radius:10px;animation:digFill 2.5s .5s ease forwards;}
+@keyframes digFill{to{width:100%;}}
+.btn-enter{position:relative;z-index:2;padding:18px 40px;background:linear-gradient(135deg,#c97b2e,#f0c040,#c97b2e);background-size:200% 200%;animation:shimmer 3s ease infinite,titleAnim 1s .7s ease backwards;color:#3b1a00;border:none;border-radius:50px;font-family:'Fredoka One',cursive;font-size:1.3rem;letter-spacing:2px;cursor:pointer;box-shadow:0 6px 25px rgba(240,192,64,.5),0 2px 0 #7b3f00;transition:transform .2s,box-shadow .2s;text-transform:uppercase;}
+.btn-enter:hover{transform:translateY(-4px) scale(1.05);box-shadow:0 12px 35px rgba(240,192,64,.7),0 2px 0 #7b3f00;}
+.btn-enter .arrow{display:inline-block;margin-left:8px;animation:arrowBounce 1s ease infinite;}
+@keyframes arrowBounce{0%,100%{transform:translateX(0)}50%{transform:translateX(5px)}}
+@keyframes shimmer{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.pick-anim{position:absolute;font-size:3rem;z-index:2;}
+.pick-left{left:30px;bottom:100px;animation:pickSwing 1.5s ease-in-out infinite;}
+.pick-right{right:30px;bottom:100px;animation:pickSwingR 1.5s .75s ease-in-out infinite;}
+@keyframes pickSwing{0%,100%{transform:rotate(-20deg);}50%{transform:rotate(20deg);}}
+@keyframes pickSwingR{0%,100%{transform:scaleX(-1) rotate(-20deg);}50%{transform:scaleX(-1) rotate(20deg);}}
+.dust{position:absolute;bottom:90px;width:8px;height:8px;border-radius:50%;background:#c97b2e;opacity:0;animation:dustUp var(--d,1.5s) var(--delay,0s) ease-out infinite;}
+@keyframes dustUp{0%{transform:translate(0,0) scale(1);opacity:.6;}100%{transform:translate(var(--dx,20px),-60px) scale(0);opacity:0;}}
+
+/* APP */
+#app{display:none;}
+#app.show{display:block;}
+header{background:linear-gradient(160deg,#7b3f00,#c97b2e,#f0c040,#c97b2e,#7b3f00);background-size:300% 300%;animation:shimmer 4s ease infinite;padding:18px 16px 14px;text-align:center;position:relative;overflow:hidden;border-bottom:5px solid #f0c040;box-shadow:0 6px 20px rgba(0,0,0,0.6);}
+.header-emojis{font-size:1.6rem;letter-spacing:6px;margin-bottom:4px;animation:bounce 2s infinite;}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+header h1{font-family:'Fredoka One',cursive;font-size:2.4rem;color:#fff;text-shadow:3px 3px 0 #7b3f00,5px 5px 10px rgba(0,0,0,0.4);letter-spacing:2px;line-height:1.1;}
+header h1 span{color:#ffe066;}
+.subtitle{font-family:'Fredoka One',cursive;font-size:1rem;color:#ffe8a0;margin-top:4px;text-shadow:1px 1px 3px rgba(0,0,0,0.5);}
+.iglesia-badge{display:inline-block;margin-top:8px;background:rgba(0,0,0,0.35);color:#f0c040;font-size:.78rem;font-weight:800;letter-spacing:3px;padding:4px 14px;border-radius:20px;border:1.5px solid #f0c040;text-transform:uppercase;}
+.deco-strip{display:flex;justify-content:center;gap:20px;padding:8px;font-size:1.5rem;background:#2d1a00;border-top:3px solid #7b3f00;border-bottom:3px solid #7b3f00;overflow:hidden;white-space:nowrap;}
+.deco-strip span{animation:scrollL 20s linear infinite;display:inline-block;}
+@keyframes scrollL{0%{transform:translateX(100vw)}100%{transform:translateX(-100%)}}
+.container{max-width:860px;margin:0 auto;padding:20px 14px;}
+
+/* PERGAMINO */
+.form-card{
+  background-image:
+    radial-gradient(ellipse 180px 120px at 8% 12%,rgba(101,60,10,0.28) 0%,transparent 100%),
+    radial-gradient(ellipse 140px 200px at 92% 8%,rgba(80,40,5,0.22) 0%,transparent 100%),
+    radial-gradient(ellipse 220px 140px at 50% 90%,rgba(90,50,8,0.25) 0%,transparent 100%),
+    radial-gradient(ellipse 100px 160px at 85% 55%,rgba(110,65,12,0.18) 0%,transparent 100%),
+    radial-gradient(ellipse 160px 100px at 15% 70%,rgba(95,55,10,0.20) 0%,transparent 100%),
+    repeating-linear-gradient(180deg,transparent 0px,transparent 3px,rgba(80,40,5,0.06) 3px,rgba(80,40,5,0.06) 4px),
+    repeating-linear-gradient(90deg,transparent 0px,transparent 18px,rgba(60,25,0,0.04) 18px,rgba(60,25,0,0.04) 19px),
+    linear-gradient(170deg,#e8cfa0 0%,#c9a268 8%,#dfc090 15%,#b8894e 24%,#d4b880 32%,#c09858 42%,#dbbf88 52%,#b88040 62%,#d2b070 72%,#c09858 82%,#d8bc88 100%);
+  border-radius:4px;border:none;padding:42px 28px 42px;position:relative;overflow:hidden;
+  box-shadow:inset 0 0 40px rgba(60,25,0,0.55),inset 0 0 10px rgba(40,15,0,0.35),0 10px 40px rgba(0,0,0,0.65),0 4px 0 #7a4010,0 6px 0 #5a2c00,0 8px 0 #3d1800,0 10px 20px rgba(0,0,0,0.5);
+}
+.form-card::before{content:'';position:absolute;top:0;left:0;right:0;height:28px;z-index:3;background:linear-gradient(180deg,#7a4010 0%,#a06030 40%,transparent 100%);clip-path:polygon(0% 0%,2% 60%,4% 30%,6% 80%,8% 20%,10% 70%,12% 40%,14% 90%,16% 25%,18% 75%,20% 35%,22% 85%,24% 20%,26% 65%,28% 38%,30% 78%,32% 15%,34% 68%,36% 42%,38% 88%,40% 22%,42% 72%,44% 32%,46% 82%,48% 18%,50% 62%,52% 36%,54% 84%,56% 24%,58% 74%,60% 44%,62% 90%,64% 28%,66% 70%,68% 38%,70% 80%,72% 16%,74% 66%,76% 34%,78% 86%,80% 20%,82% 68%,84% 40%,86% 88%,88% 26%,90% 72%,92% 42%,94% 78%,96% 18%,98% 60%,100% 0%,100% 0%,0% 0%);}
+.form-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:28px;z-index:3;background:linear-gradient(0deg,#7a4010 0%,#a06030 40%,transparent 100%);clip-path:polygon(0% 100%,2% 40%,4% 70%,6% 20%,8% 80%,10% 30%,12% 60%,14% 10%,16% 75%,18% 25%,20% 65%,22% 15%,24% 80%,26% 35%,28% 62%,30% 22%,32% 85%,34% 32%,36% 58%,38% 12%,40% 78%,42% 28%,44% 68%,46% 18%,48% 82%,50% 38%,52% 64%,54% 16%,56% 76%,58% 26%,60% 56%,62% 10%,64% 72%,66% 30%,68% 62%,70% 20%,72% 84%,74% 34%,76% 66%,78% 14%,80% 80%,82% 32%,84% 60%,86% 12%,88% 74%,90% 28%,92% 58%,94% 22%,96% 82%,98% 40%,100% 100%,100% 100%,0% 100%);}
+.parchment-texture{position:absolute;inset:0;z-index:1;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.45 0 0 0 0 0.28 0 0 0 0 0.05 0 0 0 0.18 0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23f)'/%3E%3C/svg%3E");background-size:300px 300px;mix-blend-mode:multiply;}
+.parchment-texture::before{content:'';position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.04' numOctaves='5' seed='8' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.38 0 0 0 0 0.20 0 0 0 0 0.02 0 0 0 0.12 0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23g)'/%3E%3C/svg%3E");background-size:200px 200px;mix-blend-mode:multiply;}
+.form-card>*:not(.parchment-texture){position:relative;z-index:2;}
+
+.form-header{display:flex;align-items:center;gap:12px;font-family:'Fredoka One',cursive;font-size:1.4rem;color:#5c2d00;margin-bottom:18px;padding:12px 0 16px;border-bottom:2px dashed #a07830;}
+.form-header .ico{width:46px;height:46px;background:radial-gradient(circle,#f0c040,#c97b2e);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;box-shadow:0 2px 8px rgba(0,0,0,0.3);flex-shrink:0;border:2px solid #a07830;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.full{grid-column:1/-1;}
+.dirt-divider{text-align:center;margin:20px 0 14px;position:relative;}
+.dirt-divider span{font-family:'Fredoka One',cursive;font-size:.85rem;background:#f0c040;color:#5c2d00;padding:4px 14px;border-radius:20px;position:relative;z-index:1;}
+.dirt-divider::before{content:'';position:absolute;top:50%;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#c97b2e,transparent);}
+.field label{display:block;font-size:.8rem;font-weight:800;color:#5c2d00;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px;}
+.field label .req{color:#e05020;margin-left:2px;}
+.field input[type=text],.field input[type=number],.field input[type=email],.field input[type=tel],.field select{width:100%;padding:10px 14px;border:2.5px solid #c9a268;border-radius:12px;background:rgba(255,253,245,0.85);font-size:.95rem;color:#3b2000;font-family:'Nunito',sans-serif;font-weight:600;transition:border-color .2s,box-shadow .2s;}
+.field input:focus,.field select:focus{outline:none;border-color:#8b5e2e;box-shadow:0 0 0 4px rgba(139,94,46,.18);}
+.radio-cards{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px;}
+.radio-card{flex:1;min-width:80px;position:relative;cursor:pointer;}
+.radio-card input{position:absolute;opacity:0;width:0;height:0;}
+.radio-card .card-body{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 8px;border:2.5px solid #c9a268;border-radius:14px;background:rgba(255,253,245,0.8);transition:all .2s;font-weight:700;font-size:.85rem;color:#5c2d00;text-align:center;}
+.radio-card .card-body .card-ico{font-size:1.4rem;}
+.radio-card input:checked+.card-body{border-color:#8b5e2e;background:linear-gradient(135deg,#fff0c0,#ffe080);box-shadow:0 3px 10px rgba(139,94,46,.3);transform:scale(1.04);color:#3b1a00;}
+.cond-box{display:none;margin-top:10px;padding:12px 14px;background:rgba(255,245,200,0.85);border:2px dashed #c9a268;border-radius:12px;}
+.cond-box.show{display:block;animation:fadeIn .25s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.cond-box label{font-size:.78rem;font-weight:800;color:#5c2d00;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:5px;}
+.cond-box input[type=text]{width:100%;padding:8px 12px;border:2px solid #c9a268;border-radius:10px;background:rgba(255,253,245,0.9);font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:600;color:#3b2000;}
+.btn-submit{width:100%;margin-top:20px;padding:16px;background:linear-gradient(135deg,#e05020,#f08030,#f0c040);background-size:200% 200%;animation:shimmer 3s ease infinite;color:#fff;border:none;border-radius:16px;font-family:'Fredoka One',cursive;font-size:1.2rem;letter-spacing:2px;cursor:pointer;box-shadow:0 5px 18px rgba(224,80,32,.45);transition:transform .15s;text-shadow:1px 1px 3px rgba(0,0,0,0.3);position:relative;z-index:2;}
+.btn-submit:hover{transform:translateY(-2px);}
+.toast{display:none;margin-top:14px;padding:14px 18px;border-radius:14px;font-weight:800;text-align:center;font-size:.95rem;font-family:'Fredoka One',cursive;letter-spacing:1px;position:relative;z-index:2;}
+.toast.show{display:block;}
+.toast.ok{background:linear-gradient(135deg,#2d8a3e,#4fc060);color:#fff;box-shadow:0 4px 14px rgba(45,138,62,.4);}
+.toast.err{background:linear-gradient(135deg,#c03020,#e05040);color:#fff;box-shadow:0 4px 14px rgba(192,48,32,.4);}
+@media(max-width:600px){.form-grid{grid-template-columns:1fr;}.full{grid-column:1;}header h1{font-size:1.7rem;}.wc-title{font-size:2rem;}.btn-enter{font-size:1rem;padding:14px 28px;}}
+</style>
+</head>
+<body>
+
+<!-- WELCOME -->
+<div id="welcome">
+  <script>
+    for(var _i=0;_i<40;_i++){var _s=document.createElement('div');_s.className='star';_s.style.cssText='width:'+(3+Math.random()*5)+'px;height:'+(3+Math.random()*5)+'px;top:'+(Math.random()*100)+'%;left:'+(Math.random()*100)+'%;--d:'+(2+Math.random()*4)+'s;--delay:'+(Math.random()*4)+'s;';document.currentScript.parentNode.appendChild(_s);}
+    var _emojis=['⛏️','🏺','🦴','🗺️','🔍','💎','🧭'];
+    for(var _j=0;_j<12;_j++){var _f=document.createElement('div');_f.className='floaty';_f.textContent=_emojis[_j%_emojis.length];_f.style.cssText='left:'+(5+Math.random()*90)+'%;--d:'+(7+Math.random()*8)+'s;--delay:'+(Math.random()*6)+'s;';document.currentScript.parentNode.appendChild(_f);}
+    for(var _k=0;_k<8;_k++){var _d=document.createElement('div');_d.className='dust';_d.style.cssText='left:'+(10+Math.random()*80)+'%;--d:'+(1+Math.random()*2)+'s;--delay:'+(Math.random()*3)+'s;--dx:'+((-30)+Math.random()*60)+'px;';document.currentScript.parentNode.appendChild(_d);}
+  </script>
+  <div class="pick-anim pick-left">⛏️</div>
+  <div class="pick-anim pick-right">⛏️</div>
+  <div class="ground"></div>
+  <div class="logo-wrap">
+    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <rect x="82" y="10" width="36" height="160" rx="4" fill="white" stroke="#111" stroke-width="4"/>
+      <rect x="20" y="55" width="160" height="30" rx="4" fill="white" stroke="#111" stroke-width="4"/>
+      <line x1="10" y1="70" x2="75" y2="70" stroke="#2abfab" stroke-width="5" stroke-linecap="round"/>
+      <line x1="10" y1="155" x2="78" y2="155" stroke="#2abfab" stroke-width="5" stroke-linecap="round"/>
+      <line x1="122" y1="55" x2="140" y2="55" stroke="#2abfab" stroke-width="4" stroke-linecap="round"/>
+      <line x1="122" y1="85" x2="140" y2="85" stroke="#2abfab" stroke-width="4" stroke-linecap="round"/>
+      <rect x="90" y="58" width="20" height="22" rx="2" fill="none" stroke="#2abfab" stroke-width="3"/>
+      <text x="125" y="115" font-family="serif" font-size="22" font-weight="bold" fill="#111" text-anchor="middle">Ebenezer</text>
+      <text x="125" y="133" font-family="serif" font-size="11" fill="#444" text-anchor="middle" font-style="italic">Piedra de Ayuda</text>
+    </svg>
+  </div>
+  <div class="wc-title">⛏️ DESTINO <span>EXCAVAR</span> ⛏️</div>
+  <div class="wc-sub">🔍 Descubriendo la verdad sobre Jesús</div>
+  <div class="wc-verse">📖 Jeremías 29:13</div>
+  <div class="dig-wrap">
+    <div class="dig-label">⛏️ Preparando la excavación...</div>
+    <div class="dig-bar"><div class="dig-fill"></div></div>
+  </div>
+  <button class="btn-enter" onclick="entrarApp()">🏛️ IGLESIA EBENEZER <span class="arrow">›</span></button>
+</div>
+
+<!-- APP REGISTRO -->
+<div id="app">
+<header>
+  <div class="header-emojis">⛏️ 🏺 🦴 🗺️ 🔍</div>
+  <h1>⛏️ DESTINO <span>EXCAVAR</span> ⛏️</h1>
+  <div class="subtitle">🔍 Descubriendo la verdad sobre Jesús · Jeremías 29:13</div>
+  <div class="iglesia-badge">🏛️ Iglesia Ebenezer · EBDV</div>
+</header>
+<div class="deco-strip"><span>⛏️ &nbsp; 🏺 &nbsp; 🦴 &nbsp; 🗺️ &nbsp; 🔍 &nbsp; 💎 &nbsp; 🧭 &nbsp; ⛏️ &nbsp; 🏺 &nbsp; 🦴 &nbsp; 🗺️ &nbsp; 🔍 &nbsp; 💎 &nbsp; 🧭 &nbsp; ⛏️ &nbsp; 🏺 &nbsp; 🦴 &nbsp; 🗺️</span></div>
+
+<div class="container">
+  <div class="form-card">
+    <div class="parchment-texture"></div>
+    <div class="form-header"><div class="ico">🏺</div>Ficha del Pequeño Arqueólogo/a</div>
+    <div class="form-grid">
+
+      <div class="full"><div class="dirt-divider"><span>👦 Datos Personales</span></div></div>
+      <div class="field full"><label>Nombre completo <span class="req">*</span></label><input type="text" id="f-nombre" placeholder="¿Cómo te llamas?"></div>
+      <div class="field"><label>Edad <span class="req">*</span></label><input type="number" id="f-edad" min="1" max="120" placeholder="Años"></div>
+      <div class="field"><label>Sexo <span class="req">*</span></label>
+        <div class="radio-cards">
+          <label class="radio-card"><input type="radio" name="sexo" value="Masculino"><div class="card-body"><span class="card-ico">👦</span>Masculino</div></label>
+          <label class="radio-card"><input type="radio" name="sexo" value="Femenino"><div class="card-body"><span class="card-ico">👧</span>Femenino</div></label>
+        </div>
+      </div>
+      <div class="field full"><label>Dirección 🏠</label><input type="text" id="f-direccion" placeholder="Calle, colonia, ciudad..."></div>
+      <div class="field"><label>Teléfono 📞</label><input type="tel" id="f-telefono" placeholder="Número de teléfono"></div>
+      <div class="field"><label>Correo electrónico 📧</label><input type="email" id="f-correo" placeholder="correo@ejemplo.com"></div>
+      <div class="field full"><label>Red social 📱</label><input type="text" id="f-redsocial" placeholder="@usuario (Instagram, Facebook, TikTok...)"></div>
+
+      <div class="full"><div class="dirt-divider"><span>💊 Salud</span></div></div>
+      <div class="field">
+        <label>¿Eres alérgico/a a algún alimento? 🍽️</label>
+        <div class="radio-cards">
+          <label class="radio-card"><input type="radio" name="alergia" value="No" checked onchange="toggleCond('cond-alergia',this)"><div class="card-body"><span class="card-ico">✅</span>No</div></label>
+          <label class="radio-card"><input type="radio" name="alergia" value="Sí" onchange="toggleCond('cond-alergia',this)"><div class="card-body"><span class="card-ico">⚠️</span>Sí</div></label>
+        </div>
+        <div id="cond-alergia" class="cond-box"><label>⚠️ ¿A qué alimento eres alérgico/a?</label><input type="text" id="f-alergia-detalle" placeholder="Escribe aquí el alimento..."></div>
+      </div>
+      <div class="field">
+        <label>¿Tienes alguna condición física? 🩺</label>
+        <div class="radio-cards">
+          <label class="radio-card"><input type="radio" name="condicion" value="No" checked onchange="toggleCond('cond-condicion',this)"><div class="card-body"><span class="card-ico">✅</span>No</div></label>
+          <label class="radio-card"><input type="radio" name="condicion" value="Sí" onchange="toggleCond('cond-condicion',this)"><div class="card-body"><span class="card-ico">⚠️</span>Sí</div></label>
+        </div>
+        <div id="cond-condicion" class="cond-box"><label>🩺 ¿Cuál es tu condición física?</label><input type="text" id="f-condicion-detalle" placeholder="Escribe aquí la condición..."></div>
+      </div>
+
+      <div class="full"><div class="dirt-divider"><span>👨‍👩‍👧‍👦 Hermanos</span></div></div>
+      <div class="field full">
+        <label>¿Tienes hermanos que asistirán al campamento? 👫</label>
+        <div class="radio-cards">
+          <label class="radio-card"><input type="radio" name="hermanos" value="No" checked onchange="toggleCond('cond-hermanos',this)"><div class="card-body"><span class="card-ico">🙅</span>No</div></label>
+          <label class="radio-card"><input type="radio" name="hermanos" value="Sí" onchange="toggleCond('cond-hermanos',this)"><div class="card-body"><span class="card-ico">👫</span>Sí</div></label>
+        </div>
+        <div id="cond-hermanos" class="cond-box">
+          <label>👫 Nombre(s) de tus hermanos que asistirán</label>
+          <input type="text" id="f-hermanos-detalle" placeholder="Ej: Juan Pérez, María Pérez...">
+          <div style="margin-top:8px;display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <div><label style="font-size:.72rem;margin-bottom:3px;display:block;">📅 Edad(es)</label><input type="text" id="f-hermanos-edades" placeholder="Ej: 10, 8, 14..."></div>
+            <div><label style="font-size:.72rem;margin-bottom:3px;display:block;">⚥ Sexo</label><input type="text" id="f-hermanos-sexo" placeholder="Ej: M, F, M..."></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="full"><div class="dirt-divider"><span>🏛️ Tu Visita</span></div></div>
+      <div class="field">
+        <label>¿Es tu primera vez en EBDV? 🌟</label>
+        <div class="radio-cards">
+          <label class="radio-card"><input type="radio" name="primera" value="Sí"><div class="card-body"><span class="card-ico">🌟</span>¡Sí!</div></label>
+          <label class="radio-card"><input type="radio" name="primera" value="No" checked><div class="card-body"><span class="card-ico">😊</span>No</div></label>
+        </div>
+      </div>
+      <div class="field">
+        <label>¿Has visitado nuestra iglesia antes? ⛪</label>
+        <div class="radio-cards">
+          <label class="radio-card"><input type="radio" name="visitado" value="Sí"><div class="card-body"><span class="card-ico">⛪</span>Sí</div></label>
+          <label class="radio-card"><input type="radio" name="visitado" value="No" checked><div class="card-body"><span class="card-ico">👋</span>No</div></label>
+        </div>
+      </div>
+
+    </div>
+    <button class="btn-submit" onclick="registrar()">⛏️ ¡REGISTRAR ARQUEÓLOGO/A! 🏺</button>
+    <div id="toast" class="toast"></div>
+  </div>
+</div>
+</div>
+
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import{getDatabase,ref,push}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+// ⚠️ SUSTITUYE CON TU FIREBASE CONFIG
+var cfg={apiKey:"TU_API_KEY",authDomain:"TU_PROJECT.firebaseapp.com",databaseURL:"https://TU_PROJECT-default-rtdb.firebaseio.com",projectId:"TU_PROJECT",storageBucket:"TU_PROJECT.appspot.com",messagingSenderId:"TU_SENDER_ID",appId:"TU_APP_ID"};
+var app=initializeApp(cfg);
+var db=getDatabase(app);
+var dbRef=ref(db,'ebdv_destino_excavar');
+window._push=function(d){return push(dbRef,d);};
+</script>
+
+<script>
+function entrarApp(){
+  var w=document.getElementById('welcome'),a=document.getElementById('app');
+  w.classList.add('hide');
+  setTimeout(function(){w.style.display='none';a.classList.add('show');},800);
+}
+function toggleCond(id,radio){document.getElementById(id).classList.toggle('show',radio.value==='Sí');}
+function getRadio(name){var s=document.querySelector('input[name="'+name+'"]:checked');return s?s.value:'';}
+function rango(e){e=parseInt(e);if(e<=12)return'Niños';if(e<=25)return'Jóvenes';if(e<=59)return'Adultos';return'Adultos Mayores';}
+function toast(msg,ok){var t=document.getElementById('toast');t.textContent=msg;t.className='toast show '+(ok?'ok':'err');setTimeout(function(){t.className='toast';},3500);}
+function registrar(){
+  var nombre=document.getElementById('f-nombre').value.trim();
+  var edad=document.getElementById('f-edad').value.trim();
+  var sexo=getRadio('sexo');
+  if(!nombre||!edad||!sexo){toast('⚠️ Nombre, edad y sexo son obligatorios.',false);return;}
+  var al=getRadio('alergia'),co=getRadio('condicion'),he=getRadio('hermanos');
+  var data={
+    nombre,edad:parseInt(edad),rango:rango(edad),sexo,
+    direccion:document.getElementById('f-direccion').value.trim(),
+    telefono:document.getElementById('f-telefono').value.trim(),
+    correo:document.getElementById('f-correo').value.trim(),
+    redSocial:document.getElementById('f-redsocial').value.trim(),
+    alergia:al,alergiaDetalle:al==='Sí'?document.getElementById('f-alergia-detalle').value.trim():'',
+    condicion:co,condicionDetalle:co==='Sí'?document.getElementById('f-condicion-detalle').value.trim():'',
+    hermanos:he,
+    hermanosDetalle:he==='Sí'?document.getElementById('f-hermanos-detalle').value.trim():'',
+    hermanosEdades:he==='Sí'?document.getElementById('f-hermanos-edades').value.trim():'',
+    hermanosSexo:he==='Sí'?document.getElementById('f-hermanos-sexo').value.trim():'',
+    primeraEBDV:getRadio('primera'),visitadoAntes:getRadio('visitado'),
+    fechaRegistro:new Date().toLocaleString('es-MX',{timeZone:'America/Monterrey'})
+  };
+  if(typeof window._push!=='function'){toast('⚠️ Configura tu Firebase primero.',false);return;}
+  window._push(data).then(function(){toast('🎉 ¡'+nombre+' registrado exitosamente! ⛏️',true);limpiar();}).catch(function(e){toast('❌ Error: '+e.message,false);});
+}
+function limpiar(){
+  ['f-nombre','f-edad','f-direccion','f-telefono','f-correo','f-redsocial','f-alergia-detalle','f-condicion-detalle','f-hermanos-detalle','f-hermanos-edades','f-hermanos-sexo'].forEach(function(id){document.getElementById(id).value='';});
+  document.querySelector('input[name=alergia][value=No]').checked=true;
+  document.querySelector('input[name=condicion][value=No]').checked=true;
+  document.querySelector('input[name=hermanos][value=No]').checked=true;
+  document.querySelector('input[name=primera][value=No]').checked=true;
+  document.querySelector('input[name=visitado][value=No]').checked=true;
+  document.querySelectorAll('input[name=sexo]').forEach(function(r){r.checked=false;});
+  document.querySelectorAll('.cond-box').forEach(function(c){c.classList.remove('show');});
+}
+</script>
+</body>
+</html>

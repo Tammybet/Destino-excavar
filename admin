@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Destino Excavar — Admin</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Nunito',sans-serif;background:#1a0f00;min-height:100vh;}
+
+header{background:linear-gradient(160deg,#7b3f00,#c97b2e,#f0c040,#c97b2e,#7b3f00);background-size:300% 300%;animation:shimmer 4s ease infinite;padding:18px 16px 14px;text-align:center;border-bottom:5px solid #f0c040;box-shadow:0 6px 20px rgba(0,0,0,0.6);}
+@keyframes shimmer{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.header-emojis{font-size:1.4rem;letter-spacing:6px;margin-bottom:4px;}
+header h1{font-family:'Fredoka One',cursive;font-size:2rem;color:#fff;text-shadow:2px 2px 0 #7b3f00;letter-spacing:2px;}
+header h1 span{color:#ffe066;}
+.admin-badge{display:inline-block;margin-top:6px;background:rgba(0,0,0,0.35);color:#f0c040;font-size:.75rem;font-weight:800;letter-spacing:3px;padding:4px 14px;border-radius:20px;border:1.5px solid #f0c040;text-transform:uppercase;}
+
+.container{max-width:1100px;margin:0 auto;padding:20px 14px;}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:20px;}
+.stat-card{background:linear-gradient(145deg,#2d1a00,#1a0f00);border:2px solid #c97b2e;border-radius:14px;padding:14px 10px;text-align:center;box-shadow:0 3px 12px rgba(0,0,0,0.4);transition:transform .2s;}
+.stat-card:hover{transform:translateY(-2px);}
+.stat-ico{font-size:1.5rem;margin-bottom:3px;}
+.stat-num{font-family:'Fredoka One',cursive;font-size:2rem;color:#f0c040;line-height:1;}
+.stat-lbl{font-size:.68rem;font-weight:800;color:#c97b2e;text-transform:uppercase;letter-spacing:.5px;margin-top:2px;}
+
+/* CONTROLS */
+.controls{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center;}
+.search-box{flex:1;min-width:200px;padding:10px 14px;border:2px solid #c97b2e;border-radius:12px;background:#2d1a00;font-size:.9rem;font-family:'Nunito',sans-serif;font-weight:700;color:#f5e6c0;}
+.search-box::placeholder{color:#c97b2e;}
+.search-box:focus{outline:none;border-color:#f0c040;}
+.btn-action{padding:10px 16px;border:none;border-radius:12px;font-family:'Fredoka One',cursive;font-size:.88rem;cursor:pointer;color:#fff;transition:opacity .2s,transform .1s;white-space:nowrap;}
+.btn-action:hover{opacity:.85;transform:translateY(-1px);}
+.btn-green{background:linear-gradient(135deg,#2d8a3e,#4fc060);}
+.btn-red{background:linear-gradient(135deg,#8b1a1a,#c03030);}
+.btn-blue{background:linear-gradient(135deg,#1a4a8b,#3070c0);}
+.btn-purple{background:linear-gradient(135deg,#7b3f00,#c97b2e);}
+
+/* FILTROS */
+.filtros{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+.filtro-btn{padding:6px 14px;border:2px solid #6a3aae;border-radius:20px;background:transparent;color:#9a5ae0;font-family:'Nunito',sans-serif;font-weight:700;font-size:.78rem;cursor:pointer;transition:all .2s;}
+.filtro-btn.active,.filtro-btn:hover{background:#6a3aae;color:#fff;}
+
+/* TABLE */
+.table-wrap{overflow-x:auto;border-radius:14px;box-shadow:0 4px 20px rgba(0,0,0,0.5);}
+table{width:100%;border-collapse:collapse;background:#1a0f2e;font-size:.78rem;}
+thead{background:linear-gradient(135deg,#3a1a6e,#6a3aae);color:#d4aaff;font-family:'Fredoka One',cursive;font-size:.75rem;}
+th{padding:12px 8px;text-align:left;white-space:nowrap;letter-spacing:.5px;}
+td{padding:9px 8px;border-bottom:1px solid #2a1a4e;color:#e8d0ff;font-weight:600;}
+tr:nth-child(even) td{background:rgba(106,58,174,0.08);}
+tr:hover td{background:rgba(154,90,224,0.12);}
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:.7rem;font-weight:800;}
+.bm{background:#1a3a6e;color:#80b0ff;}.bf{background:#4e1a3e;color:#ff80c0;}
+.bn{background:#4e3a00;color:#ffcc44;}.bj{background:#004e20;color:#44ff88;}
+.ba{background:#1a1a5e;color:#8888ff;}.bma{background:#3e1a00;color:#ff8844;}
+.bsi{background:#004e20;color:#44ff88;}.bno{background:#3e0000;color:#ff6666;}
+
+.empty-state{text-align:center;padding:50px;color:#6a3aae;font-family:'Fredoka One',cursive;}
+.empty-state .big{font-size:3.5rem;margin-bottom:10px;}
+
+/* CONTADOR LIVE */
+.live-dot{display:inline-block;width:10px;height:10px;background:#4fc060;border-radius:50%;margin-right:6px;animation:pulse 1.5s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.5;transform:scale(1.4);}}
+.live-label{font-size:.78rem;color:#4fc060;font-weight:800;display:flex;align-items:center;padding:6px 0;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-emojis">🔐 📊 📋 🗺️ ⛏️</div>
+  <h1>⛏️ DESTINO <span>EXCAVAR</span> — ADMIN</h1>
+  <div class="admin-badge">🔐 Panel de Administrador · Iglesia Ebenezer · EBDV</div>
+</header>
+
+<div class="container">
+
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-ico">👥</div><div class="stat-num" id="s-total">0</div><div class="stat-lbl">Total</div></div>
+    <div class="stat-card"><div class="stat-ico">👦</div><div class="stat-num" id="s-masc">0</div><div class="stat-lbl">Masculino</div></div>
+    <div class="stat-card"><div class="stat-ico">👧</div><div class="stat-num" id="s-fem">0</div><div class="stat-lbl">Femenino</div></div>
+    <div class="stat-card"><div class="stat-ico">🧒</div><div class="stat-num" id="s-ninos">0</div><div class="stat-lbl">Niños 0-12</div></div>
+    <div class="stat-card"><div class="stat-ico">🧑</div><div class="stat-num" id="s-jovenes">0</div><div class="stat-lbl">Jóvenes 13-25</div></div>
+    <div class="stat-card"><div class="stat-ico">🧔</div><div class="stat-num" id="s-adultos">0</div><div class="stat-lbl">Adultos 26-59</div></div>
+    <div class="stat-card"><div class="stat-ico">👴</div><div class="stat-num" id="s-mayores">0</div><div class="stat-lbl">Mayores 60+</div></div>
+    <div class="stat-card"><div class="stat-ico">🌟</div><div class="stat-num" id="s-nuevos">0</div><div class="stat-lbl">1ª vez EBDV</div></div>
+  </div>
+
+  <div class="controls">
+    <input type="text" class="search-box" id="search-box" placeholder="🔍 Buscar por nombre..." oninput="renderTabla()">
+    <button class="btn-action btn-green" onclick="exportarExcel()">📊 Excel</button>
+    <button class="btn-action btn-red" onclick="exportarPDF()">📄 PDF</button>
+    <button class="btn-action btn-blue" onclick="imprimirLista()">🖨️ Imprimir</button>
+    <button class="btn-action btn-purple" onclick="cargarRegistros()">🔄 Actualizar</button>
+  </div>
+
+  <div class="filtros" id="filtros">
+    <button class="filtro-btn active" onclick="setFiltro('todos',this)">Todos</button>
+    <button class="filtro-btn" onclick="setFiltro('Niños',this)">🧒 Niños</button>
+    <button class="filtro-btn" onclick="setFiltro('Jóvenes',this)">🧑 Jóvenes</button>
+    <button class="filtro-btn" onclick="setFiltro('Adultos',this)">🧔 Adultos</button>
+    <button class="filtro-btn" onclick="setFiltro('Adultos Mayores',this)">👴 Mayores</button>
+    <button class="filtro-btn" onclick="setFiltro('Masculino',this)">👦 Masc.</button>
+    <button class="filtro-btn" onclick="setFiltro('Femenino',this)">👧 Fem.</button>
+    <button class="filtro-btn" onclick="setFiltro('primera',this)">🌟 1ª vez</button>
+    <button class="filtro-btn" onclick="setFiltro('alergia',this)">⚠️ Alergias</button>
+  </div>
+
+  <div class="live-label"><span class="live-dot"></span> Actualizando en tiempo real desde Firebase</div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>#</th><th>Nombre</th><th>Edad</th><th>Rango</th><th>Sexo</th><th>Teléfono</th><th>Correo</th><th>Red Social</th><th>Dirección</th><th>Alergia</th><th>Condición</th><th>Hermanos</th><th>1ª EBDV</th><th>Visitó antes</th><th>Fecha Registro</th></tr>
+      </thead>
+      <tbody id="tabla-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import{getDatabase,ref,onValue}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+// ⚠️ MISMO FIREBASE CONFIG QUE EL REGISTRO
+var cfg={apiKey:"TU_API_KEY",authDomain:"TU_PROJECT.firebaseapp.com",databaseURL:"https://TU_PROJECT-default-rtdb.firebaseio.com",projectId:"TU_PROJECT",storageBucket:"TU_PROJECT.appspot.com",messagingSenderId:"TU_SENDER_ID",appId:"TU_APP_ID"};
+var app=initializeApp(cfg);
+var db=getDatabase(app);
+var dbRef=ref(db,'ebdv_destino_excavar');
+var cache=[];
+window._getData=function(){return cache;};
+window.cargarRegistros=function(){
+  onValue(dbRef,function(snap){
+    cache=[];
+    snap.forEach(function(c){cache.push(Object.assign({_id:c.key},c.val()));});
+    cache.reverse();
+    renderTabla();renderStats();
+  });
+};
+window.cargarRegistros();
+</script>
+
+<script>
+var filtroActual='todos';
+function setFiltro(f,btn){
+  filtroActual=f;
+  document.querySelectorAll('.filtro-btn').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  renderTabla();
+}
+function aplicarFiltro(reg){
+  if(filtroActual==='todos')return reg;
+  if(filtroActual==='primera')return reg.filter(function(r){return r.primeraEBDV==='Sí';});
+  if(filtroActual==='alergia')return reg.filter(function(r){return r.alergia==='Sí';});
+  return reg.filter(function(r){return r.rango===filtroActual||r.sexo===filtroActual;});
+}
+function renderTabla(){
+  var reg=typeof window._getData==='function'?window._getData():[];
+  var q=(document.getElementById('search-box')||{value:''}).value.toLowerCase();
+  var fil=aplicarFiltro(reg).filter(function(r){return r.nombre&&r.nombre.toLowerCase().includes(q);});
+  var tbody=document.getElementById('tabla-body');
+  if(!fil.length){tbody.innerHTML='<tr><td colspan="15"><div class="empty-state"><div class="big">📋</div><p>Sin registros</p></div></td></tr>';return;}
+  var html='';
+  fil.forEach(function(r,i){
+    var sB=r.sexo==='Masculino'?'<span class="badge bm">👦</span>':'<span class="badge bf">👧</span>';
+    var rB=r.rango==='Niños'?'<span class="badge bn">🧒</span>':r.rango==='Jóvenes'?'<span class="badge bj">🧑</span>':r.rango==='Adultos'?'<span class="badge ba">🧔</span>':'<span class="badge bma">👴</span>';
+    var alT=r.alergia==='Sí'?'<span class="badge bsi">⚠️ Sí</span><br><small style="color:#aaa">'+esc(r.alergiaDetalle)+'</small>':'<span class="badge bno">No</span>';
+    var coT=r.condicion==='Sí'?'<span class="badge bsi">⚠️ Sí</span><br><small style="color:#aaa">'+esc(r.condicionDetalle)+'</small>':'<span class="badge bno">No</span>';
+    var hmT=r.hermanos==='Sí'?'<span class="badge bsi">👫 Sí</span><br><small style="color:#aaa">'+esc(r.hermanosDetalle)+'</small><br><small style="color:#aaa">Edades: '+esc(r.hermanosEdades)+' | Sexo: '+esc(r.hermanosSexo)+'</small>':'<span class="badge bno">No</span>';
+    var p1=r.primeraEBDV==='Sí'?'<span class="badge bsi">🌟 Sí</span>':'<span class="badge bno">No</span>';
+    var vA=r.visitadoAntes==='Sí'?'<span class="badge bsi">⛪ Sí</span>':'<span class="badge bno">No</span>';
+    html+='<tr><td>'+(i+1)+'</td><td><strong>'+esc(r.nombre)+'</strong></td><td>'+esc(r.edad)+'</td><td>'+rB+' '+esc(r.rango)+'</td><td>'+sB+' '+esc(r.sexo)+'</td><td>'+esc(r.telefono)+'</td><td>'+esc(r.correo)+'</td><td>'+esc(r.redSocial)+'</td><td>'+esc(r.direccion)+'</td><td>'+alT+'</td><td>'+coT+'</td><td>'+hmT+'</td><td>'+p1+'</td><td>'+vA+'</td><td style="font-size:.7rem;color:#9a5ae0">'+esc(r.fechaRegistro)+'</td></tr>';
+  });
+  tbody.innerHTML=html;
+}
+function renderStats(){
+  var reg=typeof window._getData==='function'?window._getData():[];
+  document.getElementById('s-total').textContent=reg.length;
+  document.getElementById('s-masc').textContent=reg.filter(function(r){return r.sexo==='Masculino';}).length;
+  document.getElementById('s-fem').textContent=reg.filter(function(r){return r.sexo==='Femenino';}).length;
+  document.getElementById('s-ninos').textContent=reg.filter(function(r){return r.rango==='Niños';}).length;
+  document.getElementById('s-jovenes').textContent=reg.filter(function(r){return r.rango==='Jóvenes';}).length;
+  document.getElementById('s-adultos').textContent=reg.filter(function(r){return r.rango==='Adultos';}).length;
+  document.getElementById('s-mayores').textContent=reg.filter(function(r){return r.rango==='Adultos Mayores';}).length;
+  document.getElementById('s-nuevos').textContent=reg.filter(function(r){return r.primeraEBDV==='Sí';}).length;
+}
+function esc(v){return(v||'').toString().replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function buildHTML(reg){
+  var filas=reg.map(function(r,i){
+    var hm=r.hermanos==='Sí'?'Sí: '+esc(r.hermanosDetalle)+' | Edades: '+esc(r.hermanosEdades)+' | Sexo: '+esc(r.hermanosSexo):'No';
+    return'<tr><td>'+(i+1)+'</td><td>'+esc(r.nombre)+'</td><td>'+esc(r.edad)+'</td><td>'+esc(r.rango)+'</td><td>'+esc(r.sexo)+'</td><td>'+esc(r.telefono)+'</td><td>'+(r.alergia==='Sí'?'⚠️ '+esc(r.alergiaDetalle):'No')+'</td><td>'+(r.condicion==='Sí'?'⚠️ '+esc(r.condicionDetalle):'No')+'</td><td>'+hm+'</td><td>'+esc(r.primeraEBDV)+'</td><td>'+esc(r.visitadoAntes)+'</td></tr>';
+  }).join('');
+  return'<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Destino Excavar — Asistencia</title><style>body{font-family:Arial,sans-serif;padding:20px;color:#222;}h1{font-size:1.3rem;text-align:center;margin-bottom:4px;}h2{font-size:.85rem;text-align:center;color:#777;margin-bottom:16px;}table{width:100%;border-collapse:collapse;font-size:.7rem;}th{background:#3a1a6e;color:#d4aaff;padding:7px 5px;text-align:left;}td{padding:6px 5px;border-bottom:1px solid #ddd;vertical-align:top;}tr:nth-child(even) td{background:#f5f0ff;}@media print{.no-print{display:none!important;}}</style></head><body><h1>⛏️ DESTINO EXCAVAR — Lista de Asistencia</h1><h2>Iglesia Ebenezer · EBDV · Total: '+reg.length+' registros</h2><table><thead><tr><th>#</th><th>Nombre</th><th>Edad</th><th>Rango</th><th>Sexo</th><th>Teléfono</th><th>Alergia</th><th>Condición</th><th>Hermanos</th><th>1ª EBDV</th><th>Visitó</th></tr></thead><tbody>'+filas+'</tbody></table></body></html>';
+}
+function exportarPDF(){
+  var reg=typeof window._getData==='function'?window._getData():[];
+  if(!reg.length){alert('No hay registros.');return;}
+  var win=window.open('','_blank');
+  win.document.write(buildHTML(reg));
+  win.document.close();
+  setTimeout(function(){win.print();},800);
+}
+function imprimirLista(){
+  var reg=typeof window._getData==='function'?window._getData():[];
+  if(!reg.length){alert('No hay registros.');return;}
+  var win=window.open('','_blank');
+  win.document.write(buildHTML(reg));
+  win.document.close();win.focus();
+}
+function exportarExcel(){
+  var reg=typeof window._getData==='function'?window._getData():[];
+  if(!reg.length){alert('No hay registros.');return;}
+  var data=reg.map(function(r,i){return{'#':i+1,'Nombre':r.nombre||'','Edad':r.edad||'','Rango':r.rango||'','Sexo':r.sexo||'','Dirección':r.direccion||'','Teléfono':r.telefono||'','Correo':r.correo||'','Red Social':r.redSocial||'','Alergia':r.alergia||'','Detalle Alergia':r.alergiaDetalle||'','Condición':r.condicion||'','Detalle Condición':r.condicionDetalle||'','Hermanos':r.hermanos||'','Nombres Hermanos':r.hermanosDetalle||'','Edades Hermanos':r.hermanosEdades||'','Sexo Hermanos':r.hermanosSexo||'','1ª EBDV':r.primeraEBDV||'','Visitó Antes':r.visitadoAntes||'','Fecha':r.fechaRegistro||''};});
+  var ws=XLSX.utils.json_to_sheet(data);
+  var wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Asistencia');
+  XLSX.writeFile(wb,'DestinoExcavar_Asistencia.xlsx');
+}
+</script>
+</body>
+</html>
